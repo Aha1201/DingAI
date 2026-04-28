@@ -1,4 +1,4 @@
-import { Profile, PersonType } from './types';
+import { Profile, PersonType, SocialPlatform } from './types';
 
 export const PERSON_TYPES: Record<PersonType, { label: string; shortLabel: string; icon: string; description: string; examples: string[]; color: string }> = {
   influencer: { label: 'Find Influencer', shortLabel: 'Influencer', icon: '⭐', description: 'Discover social media influencers', examples: ['Fitness influencers', 'Tech creators'], color: '#F59E0B' },
