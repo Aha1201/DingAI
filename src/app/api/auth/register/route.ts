@@ -1,8 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const users: any[] = [
-  { id: '1', name: 'Demo User', email: 'demo@dingai.com', password: 'password123', credits: 100 }
-]
+// 使用文件系统存储（持久化）
+import fs from 'fs'
+import path from 'path'
+
+const DB_FILE = path.join(process.cwd(), 'users.json')
+
+function getUsers(): any[] {
+  try {
+    if (fs.existsSync(DB_FILE)) {
+      const data = fs.readFileSync(DB_FILE, 'utf-8')
+      return JSON.parse(data)
+    }
+  } catch (error) {
+    console.error('Error reading users:', error)
+  }
+  return [
+    { id: '1', name: 'Demo User', email: 'demo@dingai.com', password: 'password123', credits: 100 }
+  ]
+}
+
+function saveUsers(users: any[]) {
+  try {
+    fs.writeFileSync(DB_FILE, JSON.stringify(users, null, 2))
+  } catch (error) {
+    console.error('Error saving users:', error)
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,6 +40,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Password must be at least 8 characters' }, { status: 400 })
     }
 
+    const users = getUsers()
     const existingUser = users.find(u => u.email === email)
     if (existingUser) {
       return NextResponse.json({ error: 'User already exists' }, { status: 400 })
@@ -30,6 +55,7 @@ export async function POST(request: NextRequest) {
     }
 
     users.push(user)
+    saveUsers(users)
 
     return NextResponse.json({
       success: true,
